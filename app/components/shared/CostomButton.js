@@ -1,10 +1,11 @@
 import React from 'react'
-import {StyleSheet, Text, TouchableOpacity} from 'react-native'
+import {StyleSheet, TouchableOpacity} from 'react-native'
+import BestlearnText from './BestlearnText';
 
 const CustomButton = ({title, onPress, color="tomato"}) => {
     return ( 
         <TouchableOpacity style={[styles.button, {backgroundColor: color}]} onPress={onPress}>
-            <Text style={styles.text}> {title} </Text>
+            <BestlearnText size="2" styles={styles.text}> {title} </BestlearnText>
         </TouchableOpacity>
      );
 };
@@ -23,6 +24,5 @@ const styles = StyleSheet.create({
   },
   text: {
     color: "white",
-    fontSize: 18
   }
 })

@@ -1,5 +1,5 @@
 import React from 'react'
-import CustomButton from '../CostomButton';
+import CustomButton from '../shared/CostomButton';
 import { useFormikContext } from 'formik';
 
 

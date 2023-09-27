@@ -1,6 +1,6 @@
 import React from 'react'
 import {useFormikContext} from 'formik'
-import BestlearnTextInput from '../BestlearnTextInput';
+import BestlearnTextInput from '../shared/BestlearnTextInput';
 import ErrorMessage from './ErrorMessage';
 
 const BestlearnFormField = ({name, ...otherProps}) => {

@@ -1,8 +1,8 @@
 import React from 'react'
 import {View, StyleSheet, Image} from 'react-native'
 import * as Yup from 'yup'
-import Constants from 'expo-constants'
 import {BestlearnForm, BestlearnFormField, SubmitButton} from '../components/forms'
+import Screen from '../components/shared/Screen'
 
 
 const validationSchema = Yup.object().shape({
@@ -16,7 +16,7 @@ const validationSchema = Yup.object().shape({
 const Register = () => {
     
     return ( 
-        <View style={styles.container} >
+        <Screen style={styles.container} >
             <Image style={styles.logo} source={require('../assets/logo.png')}/>
             <BestlearnForm
                 initialValues={{fullname: "", email: "", password: "", passwordConfirmation: ""}}
@@ -65,7 +65,7 @@ const Register = () => {
                             />
                         </View>
             </BestlearnForm>
-        </View>
+        </Screen>
      );
 };
  
@@ -73,16 +73,14 @@ export default Register;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    marginTop: Constants.statusBarHeight,
     alignItems: "center",
     backgroundColor: "#fff"
   },
   logo: {
-    width: 300,
+    width: 270,
     height: 200,
     marginTop: 20, 
-    marginBottom: 20
+    marginBottom: 40
   }
 })
 
