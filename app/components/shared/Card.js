@@ -6,13 +6,13 @@ import BestlearnText from './BestlearnText';
 const Card = ({title, price, image, courseInfo=null}) => {
     return ( 
         <View style={styles.card}>
-            <Image resizeMode="contain" source={image} style={styles.courseImage} />
+            <Image resizeMode="contain" source={{uri: `https://elearnapi.ahmohazzab.com/${image}`}} style={styles.courseImage} />
             <View style={styles.courseDetails}>
                 <BestlearnText size="2" styles={styles.title}> {title} </BestlearnText>
-                <BestlearnText size="2" styles={styles.title}> {price} </BestlearnText>
+                <BestlearnText size="2" styles={styles.title}> {price === 0 ? "Free" : price} </BestlearnText>
             </View>
             {courseInfo ? (
-              <View>
+              <View style={{flex: 1}}>
                 <BestlearnText size="2.5">
                   Course info :
                 </BestlearnText>
@@ -32,10 +32,10 @@ export default Card;
 
 const styles = StyleSheet.create({
   card: {
+    flex: 1,
     borderRadius: 15,
     backgroundColor: "white",
     marginBottom: 20,
-    overflow: "hidden",
   },
   courseImage: {
     width: "100%",

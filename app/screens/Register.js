@@ -1,8 +1,11 @@
 import React from 'react'
 import {View, StyleSheet, Image} from 'react-native'
+import Toast from 'react-native-tiny-toast';
 import * as Yup from 'yup'
 import {BestlearnForm, BestlearnFormField, SubmitButton} from '../components/forms'
 import Screen from '../components/shared/Screen'
+import { registerUser } from './../services/user';
+import { costumToast, loadingToast } from '../utils/toast';
 
 
 const validationSchema = Yup.object().shape({
@@ -13,14 +16,41 @@ const validationSchema = Yup.object().shape({
     .oneOf([Yup.ref("password"), null], 'Passwords must be equal')
 });
 
-const Register = () => {
+const Register = ({navigation}) => {
+
+    //const [loading, setLoading] = useState(false);
+
+    const handleUserRegistration = async (user) => {
+        try {
+            loadingToast("Registering...");
+
+            const status = await registerUser(user);
+
+            if (status === 201) {
+                //setLoading(false);
+                Toast.hide()
+                navigation.navigate('Login', {successRegister: true});
+            } else {
+                console.log("Server error");
+                Toast.hide();
+                costumToast("An error was occured");
+                //setLoading(false);
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
     
     return ( 
         <Screen style={styles.container} >
             <Image style={styles.logo} source={require('../assets/logo.png')}/>
             <BestlearnForm
                 initialValues={{fullname: "", email: "", password: "", passwordConfirmation: ""}}
-                onSubmit={values => console.log(values)}
+                onSubmit={(user) => {
+                    console.log(user);
+                    //setLoading(true);
+                    handleUserRegistration(user);
+                }}
                 validationSchema={validationSchema}
             >
                         <BestlearnFormField 
@@ -65,6 +95,9 @@ const Register = () => {
                             />
                         </View>
             </BestlearnForm>
+            {/* {loading ? 
+                <ActivityIndicator size="large" color="tomato" animating={loading} style={{ flex: 1}}/>
+                : null } */}
         </Screen>
      );
 };

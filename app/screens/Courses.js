@@ -1,48 +1,36 @@
-import React from 'react'
+import React, {useContext, useEffect} from 'react'
 import { FlatList, StyleSheet, TouchableOpacity} from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Screen from '../components/shared/Screen';
 import Card from '../components/shared/Card';
+import { BestlearnContext } from '../containers/TopTabNavigator';
+import { decodeToken } from './../utils/jwt';
 
-
-const courses = [
-    {
-        id: 1,
-        title: "NodeJs",
-        price: "300",
-        image: require("../assets/courses/nodejs.png"),
-    },
-    {
-        id: 2,
-        title: "ReactJs",
-        price: "200",
-        image: require("../assets/courses/reactjs.png"),
-    },
-    {
-        id: 3,
-        title: "ElectronJs",
-        price: "100",
-        image: require("../assets/courses/electronjs.jpg"),
-    },
-    {
-        id: 4,
-        title: "React Native",
-        price: "150",
-        image: require("../assets/courses/reactnative.png"),
-    },
-];
 
 const Courses = ({navigation}) => {
+
+    const {courses, loading} = useContext(BestlearnContext);
+
+    useEffect(()=> {
+        const myFunc = async () => {
+            const token = await AsyncStorage.getItem("token");
+            console.log(decodeToken(token));
+        };
+        myFunc();
+    },[])
+
+
     return ( 
         <Screen style={styles.container}>
             <FlatList
                 data={courses}
-                keyExtractor={course => course.id.toString()}
+                keyExtractor={course => course._id.toString()}
                 renderItem={({item}) => (
                     <TouchableOpacity onPress={() => navigation.navigate('CourseDetails', {course: item})}> 
                         <Card 
                             title={item.title}
                             price={item.price}
-                            image={item.image}
+                            image={item.imageUrl}
                         />
                     </TouchableOpacity>
                 )}

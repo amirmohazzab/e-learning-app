@@ -1,11 +1,21 @@
 import React from 'react'
 import { Text, View, StyleSheet, Image, TouchableOpacity, TouchableHighlight } from 'react-native'
+import {StackActions} from "@react-navigation/native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Screen from '../components/shared/Screen';
 import Icon from '../components/shared/Icon'
 import ItemSeparator from '../components/shared/ItemSeparator';
 
 
-const Account = () => {
+
+const Account = ({navigation}) => {
+
+    const handleLogout = async () => {
+      await AsyncStorage.removeItem("token");
+      await AsyncStorage.removeItem("userId");
+      navigation.dispatch(StackActions.replace("Welcome"));
+    };
+
     return ( 
         <Screen style={styles.screen}>
             <View style={styles.container}> 
@@ -14,12 +24,12 @@ const Account = () => {
                     <Text style={styles.title}> Amir Mohazzab </Text>
                     <Text style={styles.subTitle}> ahm.mohazzab@gmail.com </Text>
                 </View>
-                <TouchableOpacity onPress={()=>{}} style={{alignSelf: "center", marginLeft: 15}}>
+                <TouchableOpacity onPress={()=> {}} style={{alignSelf: "center", marginLeft: 15}}>
                     <Icon name="settings" iconColor="tomato" />
                 </TouchableOpacity>
             </View>
             <ItemSeparator height={3} />
-            <TouchableHighlight>
+            <TouchableHighlight underlayColor="#f8f4f4" onPress={handleLogout}>
                 <View style={[styles.container, {flexDirection: "row-reverse"}]}>
                     <Icon name="exit-outline" iconColor="tomato" size={32} />  
                     <View style={styles.subTitle}>

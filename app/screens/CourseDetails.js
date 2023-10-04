@@ -1,5 +1,5 @@
 import React from 'react'
-import {View, StyleSheet, Text} from 'react-native'
+import {StyleSheet} from 'react-native'
 import {RFPercentage} from 'react-native-responsive-fontsize'
 import Screen from '../components/shared/Screen';
 import Card from '../components/shared/Card';
@@ -21,7 +21,8 @@ const CourseDetails = ({navigation, route}) => {
       }
     });
 
-    const {id, title, price, image} = route.params.course;
+    const {_id, title, price, imageUrl} = route.params.course;
+
     const courseInfo = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi cursus eu orci sit amet ullamcorper. Nulla at dignissim sem, eu ullamcorper tellus. Vestibulum vel lobortis lorem, quis congue dolor. Aliquam aliquam turpis nec lectus imperdiet pharetra. Aliquam felis tortor, convallis vestibulum ligula nec, pellentesque porttitor enim. Morbi vitae justo in mi pretium aliquet. Aliquam erat volutpat.
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi cursus eu orci sit amet ullamcorper. Nulla at dignissim sem, eu ullamcorper tellus. Vestibulum vel lobortis lorem, quis congue dolor. Aliquam aliquam turpis nec lectus imperdiet pharetra. Aliquam felis tortor, convallis vestibulum ligula nec, pellentesque porttitor enim. Morbi vitae justo in mi pretium aliquet. Aliquam erat volutpat. 
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi cursus eu orci sit amet ullamcorper. Nulla at dignissim sem, eu ullamcorper tellus. Vestibulum vel lobortis lorem, quis congue dolor. Aliquam aliquam turpis nec lectus imperdiet pharetra. Aliquam felis tortor, convallis vestibulum ligula nec, pellentesque porttitor enim. Morbi vitae justo in mi pretium aliquet. Aliquam erat volutpat.
@@ -34,7 +35,7 @@ const CourseDetails = ({navigation, route}) => {
             <Card
               title={title}
               price={price}
-              image={image} 
+              image={imageUrl} 
               courseInfo={courseInfo}
             />
         </Screen>
