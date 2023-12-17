@@ -1,12 +1,15 @@
 import React, {useEffect} from 'react'
 import {Alert, View, ImageBackground, StyleSheet, BackHandler} from 'react-native'
-import {NetInfo} from '@react-native-community/netinfo';
 import {StackActions, useNavigationState} from '@react-navigation/native'
-import CustomButton from '../components/shared/CostomButton';
-import BestlearnText from '../components/shared/BestlearnText';
+import {useDispatch} from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNetInfo } from "@react-native-community/netinfo";
+
 import { decodeToken } from './../utils/jwt';
 import { costumToast } from '../utils/toast';
+//import { addUser } from '../features/userSlice';
+import CustomButton from '../components/shared/CostomButton';
+import BestlearnText from '../components/shared/BestlearnText';
 
 
 const confirmationAlert = () => {
@@ -15,7 +18,6 @@ const confirmationAlert = () => {
       {
           text: "Ok",
           onPress: BackHandler.exitApp
-
       }
   ], 
   {cancelable: false}
@@ -24,10 +26,14 @@ const confirmationAlert = () => {
 const Welcome = ({navigation}) => {
 
     const screenIndex = useNavigationState(state => state.index);
+    console.log(screenIndex)
+    const dispatch = useDispatch();
+
+    const { isConnected } = useNetInfo();
 
     useEffect(() => {
       let currentCount = 0;
-      console.log(screenIndex);
+      //console.log(screenIndex);
 
       if (screenIndex <= 0) {
         BackHandler.addEventListener("hardwareBackPress", () => {
@@ -47,25 +53,24 @@ const Welcome = ({navigation}) => {
           return true;
         });
       }
-
     }, []);
 
     useEffect(() => {
         const checkForNet = async () => {
-        const state = await NetInfo.fetch();
-        // console.log('Connection Type:', state.type);
-        // console.log('Is Connected:', state.isConnected);
-        if (!state.isConnected) confirmationAlert();
+        if (!isConnected) console.log(isConnected); 
         else {
           const token = await AsyncStorage.getItem("token");
           const userId = JSON.parse(await AsyncStorage.getItem("userId"));
 
           if (token !== null && userId !== null)  {
             const decodedToken = decodeToken(token);
+            console.log(decodedToken.user.fullname);
+             //dispatch(addUser(decodedToken.user));
             
 
             if (decodedToken.user.userId === userId) {
-              navigation.dispatch(StackActions.replace("Home"));
+              navigation.dispatch(StackActions.replace("Home", {user: decodedToken.user}));
+              //navigation.navigate('Home', {user: decodedToken.user});
             } else {
               await AsyncStorage.removeItem("token");
               await AsyncStorage.removeItem("userId");

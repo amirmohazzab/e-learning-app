@@ -1,15 +1,34 @@
 import React from 'react'
-import {View, StyleSheet, Image, ScrollView} from 'react-native'
+import {View, StyleSheet, Image, ScrollView, TouchableHighlight} from 'react-native';
+import { MaterialCommunityIcons, Entypo } from '@expo/vector-icons'; 
+import {isEmpty} from "lodash";
+import {useSelector} from 'react-redux'
 import BestlearnText from './BestlearnText';
 
 
-const Card = ({title, price, image, courseInfo=null}) => {
+const Card = ({_id, title, price, image, handleSubmited, isClicked, courseInfo=null}) => {
+
+    const user = useSelector(state => state.user);
+
     return ( 
         <View style={styles.card}>
-            <Image resizeMode="contain" source={{uri: `https://elearnapi.ahmohazzab.com/${image}`}} style={styles.courseImage} />
+            <Image resizeMode="contain" source={{uri: `https://elearnappapi.ahmohazzab.com/${image}`}} style={styles.courseImage} />
+            <BestlearnText size="2" styles={styles.title}> {title} </BestlearnText>
             <View style={styles.courseDetails}>
-                <BestlearnText size="2" styles={styles.title}> {title} </BestlearnText>
                 <BestlearnText size="2" styles={styles.title}> {price === 0 ? "Free" : price} </BestlearnText>
+                <TouchableHighlight 
+                  id={_id}
+                  onPress={handleSubmited}
+                  style={{backgroundColor: "royalblue", width: 30, height: 28}}
+                > 
+                  <View style={{alignSelf: "center"}}> 
+                      {!isEmpty(user) && isClicked ? (
+                        <Entypo name="check" size={26} color="white" />
+                      ) : (
+                        <MaterialCommunityIcons name="cart-variant" size={26} color="white" />
+                      )}
+                  </View>
+                </TouchableHighlight>
             </View>
             {courseInfo ? (
               <View style={{flex: 1}}>

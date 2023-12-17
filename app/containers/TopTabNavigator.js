@@ -1,33 +1,34 @@
-import React, {createContext, useState, useEffect} from 'react'
+import React, {createContext, useEffect} from 'react'
 import {createMaterialTopTabNavigator} from '@react-navigation/material-top-tabs'
+import { useIsFocused } from "@react-navigation/native"; 
 import {RFPercentage} from 'react-native-responsive-fontsize'
+import {useNavigationState} from '@react-navigation/native'
 import Toast from 'react-native-tiny-toast';
-import { Courses, NewCourses, TopCourses } from '../screens';
+import {useDispatch} from "react-redux";
+import { Courses, Archive} from '../screens';
 import Screen from '../components/shared/Screen';
-import { fetchCourses } from './../services/courses';
 import { loadingToast } from '../utils/toast';
+import { getAllCourses } from './../features/coursesSlice';
 
 
 export const BestlearnContext = createContext({
     courses: [],
-    //loading: true
 });
 
 
 const TopTab = createMaterialTopTabNavigator();
 
-const TopTabNavigator = () => {
+const TopTabNavigator = ({navigation}) => {
 
-    //const [loading, setLoading] = useState(true);
-    const [courses, setCourses] = useState([]);
+    const dispatch = useDispatch();
+    const isFocused = useIsFocused();
+    
 
     useEffect(() => {
        try {
             const fetchData = async () => {
             loadingToast("Loading...");
-            const courses = await fetchCourses();
-            setCourses(courses);
-            //setLoading(false);
+            dispatch(getAllCourses());
             Toast.hide();
         };
         fetchData();
@@ -39,32 +40,29 @@ const TopTabNavigator = () => {
     }, []);
 
     return ( 
-        <BestlearnContext.Provider value={{courses}}>
             <Screen> 
                 <TopTab.Navigator 
-                    initialRouteName="AllCourses"
+                    initialRouteName="Courses"
                     backBehavior="none"
                     screenOptions={{
-                        activeTintColor: "tomato",
-                        inactiveTintColor: "gray",
-                        labelStyle: {
-                            fontSize: RFPercentage(1.7)
+                        tabBarActiveTintColor: "red",
+                        tabBarInactiveTintColor: "grey",
+                        tabBarIndicatorStyle: {backgroundColor: 'red'},
+                        tabBarLabelStyle: {
+                            fontSize: RFPercentage(1.7),
                         },
-                        style: {
-                            backgroundColor: "#f8f4f4"
-                        }
-                    }}
+                        tabBarPressColor: isFocused ? 'lightcyan' : 'white',
+                        tabBarStyle: { backgroundColor: isFocused ? 'lightcyan' : 'white' },
+                    }
+                } 
                 >
-                    <TopTab.Screen name="AllCourses" component={Courses} options={{tabBarLabel: "All Courses"}} />
-                    <TopTab.Screen name="NewCourses" component={NewCourses} options={{tabBarLabel: "New Courses"}} />
-                    <TopTab.Screen name="TopCourses" component={TopCourses} options={{tabBarLabel: "Top Courses"}} />
+                    <TopTab.Screen name="Courses" component={Courses}  />
+                    <TopTab.Screen name="Archive" component={Archive}  />
                 </TopTab.Navigator>
                 {/* {loading ? 
                 <ActivityIndicator size="large" color="tomato" animating={loading} style={{ flex: 1}}/>
                 : null } */}
-            </Screen>
-        </BestlearnContext.Provider>
-        
+            </Screen>    
      );
 }
  

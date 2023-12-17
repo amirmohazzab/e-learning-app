@@ -6,14 +6,24 @@ import Screen from '../components/shared/Screen'
 import { costumToast, loadingToast, successToast } from '../utils/toast';
 import { loginUser } from '../services/user';
 import Toast from 'react-native-tiny-toast';
+import axios from "axios";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {useDispatch} from 'react-redux'
+import { decodeToken } from './../utils/jwt';
+import { addUser } from '../features/userSlice';
+import { getBasket } from './../features/cartSlice';
+
 
 const validationSchema = Yup.object().shape({
     email: Yup.string().required('This field is required').email('Email is not valid'),
     password: Yup.string().required('This field is required').min(4)
 });
 
+
 const Login = ({navigation, route}) => {
 
+    const dispatch = useDispatch();
+    
     useEffect(() => {
         if (route.params.successRegister) 
             successToast("Register was successful");
@@ -22,11 +32,25 @@ const Login = ({navigation, route}) => {
 
     const handleUserLogin = async (user) => {
         try {
-            //loadingToast("Connection...");
-            const status = await loginUser(user);
-            if (status === 200) {
+            loadingToast("Connection...");
+            const data = await loginUser(user);
+            
+            
+            if (data.data.status === 200) {
+
                 Toast.hide();
-                successToast("Login was successful");
+                successToast("Login was successful"); 
+                
+                await AsyncStorage.setItem("token", JSON.stringify(data.data.data.token));
+                await AsyncStorage.setItem("userId", JSON.stringify(data.data.data.userId));
+
+
+                axios.defaults.headers.common["Authorization"] = `Bearer ${data.data.data.token}`;
+
+                const decodedToken = decodeToken(data.data.data.token);
+                dispatch(addUser(decodedToken?.user));
+                dispatch(getBasket());
+
                 navigation.reset({
                     index: 0,
                     routes: [{name: "Home"}]
@@ -37,7 +61,7 @@ const Login = ({navigation, route}) => {
             }
         } catch (err) {
             Toast.hide();
-            console.log(err)
+            //console.log(err)
         }
     }
     

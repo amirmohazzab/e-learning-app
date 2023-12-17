@@ -1,15 +1,26 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs'
 import {MaterialCommunityIcons} from '@expo/vector-icons'
+import { useSelector, useDispatch } from 'react-redux';
 import Account from '../screens/Account';
 import MyCourses from '../screens/MyCourses';
 import TopTabNavigator from './TopTabNavigator';
+import { getBasket } from '../features/cartSlice';
 
 
 
 const Tab = createBottomTabNavigator();
 
 const BottomTabsNavigator = () => {
+
+  const cart = useSelector(state => state.cart);
+  const amount = cart.totalQTY;
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getBasket());
+  }, []);
 
     return ( 
       <Tab.Navigator 
@@ -41,8 +52,8 @@ const BottomTabsNavigator = () => {
           activeTintColor: "tomato",
           inactiveTintColor: "grey",
           activeBackgroundColor: "lightcyan",
-          lableStyle: {
-            fontSize: 13
+          tabBarLabel: {
+            fontSize: 16
           }
         }}     
       >
@@ -51,7 +62,7 @@ const BottomTabsNavigator = () => {
         <Tab.Screen name="MyCourses" component={MyCourses} 
           options={{
             tabBarLabel: "My Courses",
-            tabBarBadge: 3,
+            tabBarBadge: amount,
           }}
         />
       </Tab.Navigator>

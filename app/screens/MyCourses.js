@@ -1,14 +1,17 @@
 import React, {useState} from 'react'
-import { View, StyleSheet, TouchableOpacity, FlatList, Alert} from 'react-native'
+import { View, StyleSheet, TouchableOpacity, FlatList, Alert, Button, ScrollView} from 'react-native'
 import {MaterialCommunityIcons} from '@expo/vector-icons'
 import Swipeable from 'react-native-gesture-handler/Swipeable'
+import {useDispatch, useSelector} from 'react-redux';
 import Screen from '../components/shared/Screen';
 import BestlearnText from '../components/shared/BestlearnText'
 import ItemSeparator from '../components/shared/ItemSeparator';
+import {addToBasket, deleteFromBasket, deleteFromBasketMulti, clearBasket} from '../features/cartSlice';
+import { Text } from 'react-native';
 
 
 const confirmationAlert = (course, onPress) => {
-    return Alert.alert(course.title, `Are sure to delete ${course.title}?`, [
+    return Alert.alert(course.productId.title, `Are sure to delete ${course.productId.title}?`, [
         {
             text: "Cancel",
             onPress: ()=>{},
@@ -21,7 +24,8 @@ const confirmationAlert = (course, onPress) => {
         }
     ], 
     {cancelable: false}
-    )};
+    )
+};
 
 
 const deleteAction = (course, onPress) => {
@@ -45,20 +49,62 @@ const deleteAction = (course, onPress) => {
 };
 
 
+
+const quantityAction = (course, onPressa, onPressb) => {
+    return (
+        <View style={{backgroundColor: "tomato", width: 50}}>
+            <View style={{height: "40%", justifyContent: "center", alignItems: "center"}}>
+                <TouchableOpacity onPress={() => onPressa(course)}>
+                    <MaterialCommunityIcons 
+                        name="plus"
+                        size={30}
+                        color="#fff"
+                    />
+                </TouchableOpacity>    
+            </View>
+            <View style={{height: "20%", justifyContent: "center", alignItems: "center"}}>
+                <Text style={{color: "white", fontWeight: "bold", fontSize: 20}}> {course.cartQuantity} </Text>
+            </View>
+            <View style={{height: "40%", justifyContent: "center", alignItems: "center"}}>
+                <TouchableOpacity onPress={() => onPressb(course)}>
+                    <MaterialCommunityIcons 
+                        name="minus"
+                        size={30}
+                        color="#fff"
+                    />
+                </TouchableOpacity>    
+            </View>
+        </View>
+    );
+};
+
+
+
+
 const MyCourses = () => {
 
-    const [myCourses, setMyCourses] = useState([
-        { id: 1, title:  "Nodejs", price: 200 },
-        { id: 2, title: "React Native", price: 300},
-        { id: 3, title: "Reactjs", price: 400 },
-        { id: 4, title: "Electronjs", price: 250 },
-        { id: 5, title: "Javascript", price: 350 },
-    ]);
+    const cart = useSelector(state => state.cart);
+    const dispatch = useDispatch();
+    
+    const addition = (acc, currentvalue) => {
+        return acc + currentvalue.productId?.price * currentvalue.cartQuantity;
+      }
+    
+    const total = cart.cartItems.reduce(addition, 0);
 
 
     const handleDelete = (course) => {
-        setMyCourses(myCourses.filter(c => c.id !== course.id))
+        dispatch(deleteFromBasketMulti(course.productId._id));
     };
+
+    const handleIncrease = (course) => {
+        dispatch(addToBasket(course.productId._id));  
+    };
+
+    const handleDecrease = (course) => {
+       dispatch(deleteFromBasket(course.productId._id));
+    };
+       
 
     return ( 
         <Screen style={{alignItems: "center"}}>
@@ -66,30 +112,58 @@ const MyCourses = () => {
                 <BestlearnText size="3" color="#fff" > My Courses List </BestlearnText>
             </View>
             <ItemSeparator height={3} />
-            <View style={{width: "100%"}}>
-                <FlatList 
-                    data={myCourses}
-                    keyExtractor={course => course.id.toString()}
-                    renderItem={({item}) => (
-                        <View style={{marginVertical: 7}}>
-                            <ItemSeparator height={3}/>
-                            <Swipeable renderLeftActions={() => deleteAction(item, () => handleDelete(item))}>
-                                <View style={styles.container}>
-                                    <View style={styles.details}>
-                                        <BestlearnText size="2.5">
-                                            {item.title}
-                                        </BestlearnText>
-                                        <BestlearnText size="2.5">
-                                            {`${item.price} Euro`}
-                                        </BestlearnText>
-                                    </View>
+            <ScrollView>
+                <View style={{width: "100%"}}>
+                    <FlatList 
+                        data={cart.cartItems}
+                        keyExtractor={course => course.productId._id}
+                        renderItem={({item}) => (
+                            <View style={{marginVertical: 7}}>
+                                <ItemSeparator height={3}/>
+                                    <Swipeable 
+                                    renderLeftActions={() => deleteAction(item, () => handleDelete(item))}
+                                    renderRightActions={() => quantityAction(item, () => handleIncrease(item), () => handleDecrease(item))}
+                                    >
+                                        <View style={styles.container}>
+                                            <View style={styles.details}>
+                                                <BestlearnText size="2.5">
+                                                    {item.productId.title}
+                                                </BestlearnText>
+                                                <BestlearnText size="2.5">
+                                                    {`${item.productId.price} Euro`}
+                                                </BestlearnText>
+                                            </View>
+                                        </View>
+                                    </Swipeable>
+                                <ItemSeparator height={3}/>
+                            </View>
+                        )}
+                    />
+                </View>
+                <View style={{alignItems: "center", marginVertical: 20}}>
+                    {
+                        total > 0 
+                        ? 
+                        (
+                            <>
+                                <View >
+                                    <Text style={{fontSize: 20 }}> Sum : {total} </Text>
                                 </View>
-                            </Swipeable>
-                            <ItemSeparator height={3}/>
-                        </View>
-                    )}
-                />
-            </View>
+                                <TouchableOpacity 
+                                    onPress={() => dispatch(clearBasket())}
+                                    style={{backgroundColor: "tomato", width: "90%", padding: 15, alignItems: "center", marginTop: 5}}
+                                >
+                                    <Text style={{fontSize: 25, color: "white"}}> Remove Basket </Text>
+                                </TouchableOpacity> 
+                            </>
+                        ) 
+                        : 
+                        (
+                            <Text style={{fontWeight: "bold", fontSize: 20, color: "dodgerblue"}}> Your Basket is Empty </Text>
+                        )
+                    }
+                </View>
+            </ScrollView>
         </Screen>
      );
 };
@@ -108,7 +182,7 @@ const styles = StyleSheet.create({
   },
   container:{
     flexDirection: "row",
-    padding: 15,
+    padding: 20,
     backgroundColor: "dodgerblue",
     justifyContent: "center"
    },
@@ -116,7 +190,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     backgroundColor: "#f8f4f4",
     width: "100%",
-    padding: 10,
+    padding: 15,
     borderRadius: 14,
     alignItems: "center"
    }

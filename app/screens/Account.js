@@ -1,7 +1,9 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import { Text, View, StyleSheet, Image, TouchableOpacity, TouchableHighlight } from 'react-native'
 import {StackActions} from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';
+import {useSelector} from "react-redux";
 import Screen from '../components/shared/Screen';
 import Icon from '../components/shared/Icon'
 import ItemSeparator from '../components/shared/ItemSeparator';
@@ -10,19 +12,54 @@ import ItemSeparator from '../components/shared/ItemSeparator';
 
 const Account = ({navigation}) => {
 
+
+    const [image, setImage] = useState(null);
+
+    useEffect(()=> {
+      const loadingImage = async () => {
+        const imageUri = await AsyncStorage.getItem("image");
+        if (imageUri !== null) setImage(imageUri)
+      };
+    loadingImage();
+    },[]);
+
+    const user = useSelector(state => state.user);
+
     const handleLogout = async () => {
       await AsyncStorage.removeItem("token");
       await AsyncStorage.removeItem("userId");
       navigation.dispatch(StackActions.replace("Welcome"));
     };
 
+    const pickImage = async () => {
+      let result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        await AsyncStorage.setItem("image", result.uri);
+        setImage(result.uri);
+      }
+    
+    };
+
     return ( 
         <Screen style={styles.screen}>
-            <View style={styles.container}> 
+            <View style={styles.container}>
+              <TouchableOpacity onPress={pickImage}>
+                {image 
+                ? 
+                <Image source={{uri: image}} style={styles.image}/>
+                : 
                 <Image style={styles.image} source={require('../assets/photo.jpg')}/>
+                }     
+              </TouchableOpacity> 
                 <View style={styles.details}>
-                    <Text style={styles.title}> Amir Mohazzab </Text>
-                    <Text style={styles.subTitle}> ahm.mohazzab@gmail.com </Text>
+                    <Text style={styles.title}> {user.user.fullname} </Text>
+                    <Text style={styles.subTitle}> {user.user.email} </Text>
                 </View>
                 <TouchableOpacity onPress={()=> {}} style={{alignSelf: "center", marginLeft: 15}}>
                     <Icon name="settings" iconColor="tomato" />

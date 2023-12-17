@@ -1,9 +1,8 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import http from "./"
 
 export const registerUser = async (user) => {
     try {
-        const {status} = await http.post(`${http.url}/register`, JSON.stringify(user));
+        return http.post(`${http.url}/auth/register`, JSON.stringify(user));
         
     } catch (err) {
         console.log(err);
@@ -13,11 +12,7 @@ export const registerUser = async (user) => {
 
 export const loginUser = async (user) => {
     try {
-        const {data, status} = await http.post(`${http.url}/login`, JSON.stringify(user));
-        await AsyncStorage.setItem("token", JSON.stringify(data.token));
-        await AsyncStorage.setItem("userId", JSON.stringify(data.userId));
-
-        return status;
+        return http.post(`${http.url}/auth/login`, JSON.stringify(user));
 
     } catch (err) {
         console.log(err);

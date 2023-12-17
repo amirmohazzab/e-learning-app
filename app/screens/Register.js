@@ -24,9 +24,9 @@ const Register = ({navigation}) => {
         try {
             loadingToast("Registering...");
 
-            const status = await registerUser(user);
+            const data = await registerUser(user);
 
-            if (status === 201) {
+            if (data.data.status === 201) {
                 //setLoading(false);
                 Toast.hide()
                 navigation.navigate('Login', {successRegister: true});
@@ -47,7 +47,7 @@ const Register = ({navigation}) => {
             <BestlearnForm
                 initialValues={{fullname: "", email: "", password: "", passwordConfirmation: ""}}
                 onSubmit={(user) => {
-                    console.log(user);
+                    
                     //setLoading(true);
                     handleUserRegistration(user);
                 }}
